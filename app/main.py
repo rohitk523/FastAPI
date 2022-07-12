@@ -1,7 +1,7 @@
 from multiprocessing import synchronize
 from fastapi import Depends, FastAPI
 from routers import user,txt_upload
-import schemas,models,db_database
+import models,db_database
 
 app = FastAPI()
 
