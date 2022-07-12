@@ -18,7 +18,7 @@ router = APIRouter(
 )
 
 @router.post('/')
-def upload(file: UploadFile = File(), db : Session = Depends(get_db),current_user: schemas.User = Depends(get_current_user)):
+def upload(file: UploadFile = File(), db : Session = Depends(get_db)):
     with open(file.filename,'wb') as buffer:
         shutil.copyfileobj(file.file,buffer)
     file_details = models.file_data(filename = file.filename,length = txt_len(file.filename),user_id = 2)
@@ -28,12 +28,12 @@ def upload(file: UploadFile = File(), db : Session = Depends(get_db),current_use
     return file_details
 
 @router.get('/All files')
-def all( db : Session = Depends(get_db),current_user: schemas.User = Depends(get_current_user)):
+def all( db : Session = Depends(get_db)):
     blogs = db.query(models.file_data).all()
     return blogs 
 
 @router.get('/Get User stats')
-def all( db : Session = Depends(get_db),current_user: schemas.User = Depends(get_current_user)):
+def all( db : Session = Depends(get_db)):
     blogs = db.query(models.file_data.length).all()
     user_id = db.query(models.file_data.user_id)
     total = 0
