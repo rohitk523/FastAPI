@@ -13,53 +13,55 @@ def txt_len(filename):
     for word in string.split():
         count+= len(word)
     return count
-user_id_ = 2
+
 auth_handler = Auth()
 security = HTTPBearer()
 
 router = APIRouter(
-    prefix='/Word Count',
+    prefix='',
     tags=['Upload']
 )
 
-@router.post('/')
+@router.post('/Word Count')
 def upload(file: UploadFile = File(), db : Session = Depends(get_db),credentials: HTTPAuthorizationCredentials = Security(security)):
     with open(file.filename,'wb') as buffer:
             shutil.copyfileobj(file.file,buffer)
-    file_details = models.file_data(filename = file.filename,length = txt_len(file.filename),user_id = user_id_)
+
+    token = credentials.credentials
+    decoded = auth_handler.decode_token(token)
+    user = db.query(models.User).filter(models.User.username == decoded).first()
+    
+    file_details = models.file_data(filename = file.filename,length = txt_len(file.filename),user_id = user.uuid)
     db.add(file_details)
     db.commit()
     db.refresh(file_details)
-    user = db.query(models.User).filter(models.User.id == user_id_).first()
-    token = credentials.credentials
-    decoded = auth_handler.decode_token(token)
-    try:
-        if decoded == user.username:
-            
-            return file_details
-    except:
-        raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+    
+    return file_details
     
     
 
 
 
 
-@router.get('/Get overall stats/')
+@router.get('/Get User stats')
 def all(db : Session = Depends(get_db),credentials: HTTPAuthorizationCredentials = Security(security)):
-        user = db.query(models.User).filter(models.User.id == user_id_).first()
         token = credentials.credentials
         decoded = auth_handler.decode_token(token)
-        try:
-            if  decoded == user.username:
-                blogs = db.query(models.file_data).filter(models.file_data.user_id == user_id_).all()
-                total = 0
-                for row in blogs:
-                    total+=row.length
-
-                return {'user_id':user_id_,'total_files_uploaded' :len(blogs),'total_words_counted':total}
-        except:
-            raise HTTPException(status_code=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+        user = db.query(models.User).filter(models.User.username == decoded).first()
+        blogs = db.query(models.file_data).filter(models.file_data.user_id == user.uuid).all()
+        total = 0
+        for row in blogs:
+            total+=row.length
+        return {'user_id':user.uuid,'total_files_uploaded' :len(blogs),'total_words_counted':total}
 
             
     
+'''@router.get('/{user_id}')
+def show_User(id, db : Session = Depends(get_db),credentials: HTTPAuthorizationCredentials = Security(security)):
+    token = credentials.credentials
+    decoded = auth_handler.decode_token(token)
+    user = db.query(models.User).filter(models.User.username == decoded).first()
+    files = db.query(models.User).filter(models.User.uuid == id).first()
+    if not user:
+        raise HTTPException(status_code=404,detail= f"User with the id {id} is not available")
+    return user'''
