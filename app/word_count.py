@@ -8,6 +8,7 @@ from collections import Counter
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
+nltk.download('punkt')
 
 def txt_len(filename):
     string = open(filename,encoding='utf-8').read()
