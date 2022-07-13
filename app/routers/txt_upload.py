@@ -24,27 +24,28 @@ router = APIRouter(
 
 @router.post('/Word Count')
 def upload(file: UploadFile = File(), db : Session = Depends(get_db),credentials: HTTPAuthorizationCredentials = Security(security)):
-    with open(file.filename,'wb') as buffer:
-            shutil.copyfileobj(file.file,buffer)
-
-    token = credentials.credentials
-    decoded = auth_handler.decode_token(token)
-    user = db.query(models.User).filter(models.User.username == decoded).first()
-    if decoded == user.username:
-        file_details = models.file_data(filename = file.filename,length = txt_len(file.filename),user_id = user.uuid)
-        all_files = []
-        for i in db.query(models.file_data).filter(models.file_data.user_id== file_details.user_id).all():
-            all_files.append(i.filename)
-        if file_details.filename in all_files:
-            return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='file already exists')
-        else:
-            db.add(file_details)
-            db.commit()
-            db.refresh(file_details)
-            return file_details
+    if file.filename[-3:] != 'txt':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='File uploaded is not a text file \n Please upload text file')
     else:
-        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
-    
+        with open(file.filename,'wb') as buffer:
+            shutil.copyfileobj(file.file,buffer)
+        token = credentials.credentials
+        decoded = auth_handler.decode_token(token)
+        user = db.query(models.User).filter(models.User.username == decoded).first()
+        if decoded == user.username:
+            file_details = models.file_data(filename = file.filename,length = txt_len(file.filename),user_id = user.uuid)
+            all_files = []
+            for i in db.query(models.file_data).filter(models.file_data.user_id== file_details.user_id).all():
+                all_files.append(i.filename)
+            if file_details.filename in all_files:
+                return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='file already exists')
+            else:
+                db.add(file_details)
+                db.commit()
+                db.refresh(file_details)
+                return file_details
+        else:
+            return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
     
     
 
