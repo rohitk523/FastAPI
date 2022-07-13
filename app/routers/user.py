@@ -21,7 +21,7 @@ def create_User(request: schemas.User, db : Session = Depends(get_db)):
     for i in db.query(models.User).all():
         all_users.append(i.username)
     if new_user.username in all_users:
-        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='user exists')
+        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='user already exists')
     else:
         db.add(new_user)
         db.commit()

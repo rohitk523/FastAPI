@@ -1,10 +1,7 @@
-from re import L
-from fastapi import UploadFile
 from typing import List
 from unicodedata import name
 from pydantic import BaseModel
 from typing import Union
-import schemas
 
 
 class User(BaseModel):

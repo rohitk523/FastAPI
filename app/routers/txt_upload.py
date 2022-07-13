@@ -6,13 +6,9 @@ from db_database import get_db
 from auth import Auth
 import shutil
 from fastapi.security import  HTTPBearer,HTTPAuthorizationCredentials
+from word_count import txt_len
+from word_count import word_count
 
-def txt_len(filename):
-    string = open(filename).read()
-    count = 0
-    for word in string.split():
-        count+= len(word)
-    return count
 
 auth_handler = Auth()
 security = HTTPBearer()
@@ -43,7 +39,8 @@ def upload(file: UploadFile = File(), db : Session = Depends(get_db),credentials
                 db.add(file_details)
                 db.commit()
                 db.refresh(file_details)
-                return file_details
+                wordcount = word_count(file.filename)
+                return wordcount
         else:
             return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
     
