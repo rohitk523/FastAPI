@@ -4,6 +4,8 @@ from nltk.stem import WordNetLemmatizer
 import nltk
 import re
 from collections import Counter
+import pandas as pd
+from sqlalchemy import null
 
 nltk.download('stopwords')
 nltk.download('wordnet')
@@ -16,6 +18,17 @@ def txt_len(filename):
     for word in string.split():
         count+= len(word)
     return count
+
+def list_keywords(filename):
+    string = pd.read_csv(filename)
+    return str(list(string.Keywords))
+
+def keywords_word_count(txtfile, csvfile):
+    string = pd.read_csv(csvfile)
+    names=dict(word_count(txtfile))
+    given_list = list(string.Keywords)
+    filtered_dict = dict(filter(lambda item: item[0] in given_list , names.items()))
+    return filtered_dict
 
 def word_count(filename):
     string = open(filename,encoding='utf-8').read()
