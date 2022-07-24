@@ -1,9 +1,10 @@
 from fastapi import APIRouter,Depends, HTTPException,status
 from requests import Session
-import schemas,models
-from db_database import get_db
-from auth import Auth
+from .. import schemas, models
+from ..db_database import get_db
+from ..auth import Auth
 import uuid
+import requests
 
 router  = APIRouter(
     prefix='/user',
@@ -21,13 +22,13 @@ def create_User(request: schemas.User, db : Session = Depends(get_db)):
     for i in db.query(models.User).all():
         all_users.append(i.username)
     if new_user.username in all_users:
-        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='user already exists')
+        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='user already exists',headers='User management')
     else:
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
         access_token = auth_handler.encode_token( new_user.username)
-        return {"access_token": access_token, "uuid": new_uuid}
+        return {"access token": access_token, "uuid": new_uuid}
 
 
 

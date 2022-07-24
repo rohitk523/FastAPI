@@ -5,7 +5,6 @@ import nltk
 import re
 from collections import Counter
 import pandas as pd
-from sqlalchemy import null
 
 nltk.download('stopwords')
 nltk.download('wordnet')
@@ -28,7 +27,10 @@ def keywords_word_count(txtfile, csvfile):
     names=dict(word_count(txtfile))
     given_list = list(string.Keywords)
     filtered_dict = dict(filter(lambda item: item[0] in given_list , names.items()))
-    return filtered_dict
+    if filtered_dict == {}:
+        return "Word count for uploaded keywords was not found"
+    else:
+        return filtered_dict
 
 def word_count(filename):
     string = open(filename,encoding='utf-8').read()

@@ -9,4 +9,4 @@ bcrypt
 python-multipart
 nltk
 alembic
-pandas
+PyJWT

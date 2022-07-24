@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from db_database import Base
+from .db_database import Base
 
 class file_data(Base):
     __tablename__ = "textFiles"

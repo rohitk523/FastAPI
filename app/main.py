@@ -1,8 +1,7 @@
-from multiprocessing import synchronize
 from fastapi import Depends, FastAPI
-from routers import user,txt_upload
-import models,db_database
-
+from .routers import user,txt_upload
+from . import models,db_database
+from .routers import user,txt_upload
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=db_database.engine)
